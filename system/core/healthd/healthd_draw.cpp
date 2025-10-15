@@ -87,7 +87,7 @@ void HealthdDraw::draw_date(const animation* anim) {
 
     const animation::text_field& field = anim->text_clock;
 
-    if (!graphics_available  field.font == nullptr  field.font->char_width == 0 ||
+    if (!graphics_available || field.font == nullptr || field.font->char_width == 0 ||
         field.font->char_height == 0)
         return;
 
