@@ -41,30 +41,38 @@ class HealthdDraw {
   // Detect dual display
   virtual bool has_multiple_connectors();
 
-  static std::unique_ptr<HealthdDraw> Create(animation *anim);
+  static std::unique_ptr<HealthdDraw> Create(animation* anim);
 
  protected:
+  // Clear screen.
   virtual void clear_screen();
 
-  // returns the last y-offset of where the surface ends.
+  // Returns the last y-offset of where the surface ends.
   virtual int draw_surface_centered(GRSurface* surface);
-  // Negative x or y coordinates center text.
+
+  // Draws text on screen.
   virtual int draw_text(const GRFont* font, int x, int y, const char* str);
 
-  // Negative x or y coordinates position the text away from the opposite edge
-  // that positive ones do.
+  // Determines text position.
   virtual void determine_xy(const animation::text_field& field,
                             const int length, int* x, int* y);
 
   // Draws battery animation, if it exists.
   virtual void draw_battery(const animation* anim);
+
+  // Draws the horizontal battery bar (new).
+  virtual void draw_battery_bar(int level);
+
   // Draws clock text, if animation contains text_field data.
   virtual void draw_clock(const animation* anim);
-  
+
+  // Draws date text.
   virtual void draw_date(const animation* anim);
+
   // Draws battery percentage text if animation contains text_field data.
   virtual void draw_percent(const animation* anim);
-  // Draws charger->surf_unknown or basic text.
+
+  // Draws charger->surf_unknown or fallback text.
   virtual void draw_unknown(GRSurface* surf_unknown);
 
   // Pixel sizes of characters for default font.
@@ -77,13 +85,14 @@ class HealthdDraw {
 
   // Device screen is split vertically.
   const bool kSplitScreen;
+
   // Pixels to offset graphics towards center split.
   const int kSplitOffset;
 
-  // system text font, may be nullptr
+  // System text font, may be nullptr.
   const GRFont* sys_font;
 
-  // true if minui init'ed OK, false if minui init failed
+  // True if minui init'ed OK, false if minui init failed.
   bool graphics_available;
 
  private:
