@@ -68,6 +68,8 @@ class HealthdDraw {
 
   // Draws date text.
   virtual void draw_date(const animation* anim);
+  
+  virtual void draw_header(const animation* anim);
 
   // Draws battery percentage text if animation contains text_field data.
   virtual void draw_percent(const animation* anim);
