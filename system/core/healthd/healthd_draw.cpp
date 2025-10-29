@@ -79,30 +79,64 @@ HealthdDraw::HealthdDraw(animation* anim)
 HealthdDraw::~HealthdDraw() {}
 
 void HealthdDraw::draw_date(const animation* anim) {
-    static constexpr char DATE_FORMAT[] = "%d/%m/%Y";
-    static constexpr int DATE_LENGTH = 11;
+    if (!graphics_available) return;
 
-    const animation::text_field& field = anim->text_clock;
+    // Usa o mesmo campo da porcentagem para manter o mesmo tamanho e estilo da fonte
+    const animation::text_field& percent_field = anim->text_percent;
+    if (percent_field.font == nullptr) return;
 
-    if (!graphics_available || field.font == nullptr || field.font->char_width == 0 ||
-        field.font->char_height == 0)
-        return;
-
+    // Obtém data e hora atuais
     time_t rawtime;
     time(&rawtime);
     tm* time_info = localtime(&rawtime);
 
-    char date_str[DATE_LENGTH];
-    size_t length = strftime(date_str, DATE_LENGTH, DATE_FORMAT, time_info);
+    // Formato: 22/10/2025 14:35
+    static constexpr char DATETIME_FORMAT[] = "%d/%m/%Y %H:%M";
+    static constexpr int DATETIME_LENGTH = 20;
+    char datetime_str[DATETIME_LENGTH];
+
+    size_t length = strftime(datetime_str, DATETIME_LENGTH, DATETIME_FORMAT, time_info);
     if (length < 1) return;
 
+    // Calcula posição centralizada com base na porcentagem
     int x, y;
-    determine_xy(field, length, &x, &y);
-    y += field.font->char_height + 10;
+    determine_xy(percent_field, length, &x, &y);
 
-    gr_color(field.color_r, field.color_g, field.color_b, field.color_a);
-    draw_text(field.font, x, y, date_str);
+    // Move o texto para baixo da porcentagem
+    y += percent_field.font->char_height + 10;  // 10px de espaço entre % e data/hora
+
+    // Usa a mesma cor e opacidade da porcentagem
+    gr_color(255, 255, 255, 255);
+
+    // Desenha a data/hora
+    draw_text(percent_field.font, x, y, datetime_str);
 }
+
+void HealthdDraw::draw_header(const animation* anim) {
+    if (!graphics_available) return;
+
+    // Usa a fonte da porcentagem como base de estilo
+    const animation::text_field& percent_field = anim->text_percent;
+    if (percent_field.font == nullptr) return;
+
+    const char* header_text = "DevTitans2025/1";
+
+    // Calcula posição centralizada no topo
+    int x, y;
+    int length = strlen(header_text);
+    determine_xy(percent_field, length, &x, &y);
+
+    // Força a posição no topo da tela (10px abaixo da borda superior)
+    y = 10;
+
+    // Cor fixa (pode ajustar conforme o tema)
+    gr_color(255, 255, 255, 255);  // branco puro
+
+    // Desenha o texto
+    draw_text(percent_field.font, x, y, header_text);
+}
+
+
 
 void HealthdDraw::redraw_screen(const animation* batt_anim, GRSurface* surf_unknown) {
     if (!graphics_available) return;
@@ -260,7 +294,8 @@ void HealthdDraw::draw_battery(const animation* anim) {
     if (!graphics_available) return;
 
     draw_battery_bar(anim->cur_level);
-    draw_clock(anim);
+
+    draw_header(anim);
     draw_date(anim);
     draw_percent(anim);
 }
