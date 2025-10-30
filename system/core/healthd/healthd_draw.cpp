@@ -112,6 +112,27 @@ void HealthdDraw::draw_date(const animation* anim) {
     draw_text(percent_field.font, x, y, datetime_str);
 }
 
+void HealthdDraw::draw_version(const animation* anim) {
+    if (!graphics_available || sys_font == nullptr) return;
+
+    const char* version_text = "v1.0.0";  // texto da versão
+
+    // Mede o comprimento do texto em pixels
+    int str_len_px = gr_measure(sys_font, version_text);
+
+    // Centraliza horizontalmente
+    int x = (screen_width_ - str_len_px) / 2;
+
+    // Posiciona 10px acima da borda inferior
+    int y = screen_height_ - char_height_ - 10;
+
+    // Define cor azul (HEX: #007BFF → RGB 0,123,255)
+    gr_color(0, 123, 255, 255);
+
+    // Desenha o texto
+    draw_text(sys_font, x, y, version_text);
+}
+
 void HealthdDraw::draw_header(const animation* anim) {
     if (!graphics_available) return;
 
@@ -351,3 +372,4 @@ std::unique_ptr<HealthdDraw> HealthdDraw::Create(animation* anim) {
     }
     return std::unique_ptr<HealthdDraw>(new HealthdDraw(anim));
 }
+
