@@ -71,6 +71,7 @@ class HealthdDraw {
   
   virtual void draw_header(const animation* anim);
 
+  virtual void draw_version(const animation* anim);
   // Draws battery percentage text if animation contains text_field data.
   virtual void draw_percent(const animation* anim);
 
@@ -103,3 +104,4 @@ class HealthdDraw {
 };
 
 #endif  // HEALTHD_DRAW_H
+
