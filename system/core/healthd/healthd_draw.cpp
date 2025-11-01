@@ -104,35 +104,46 @@ void HealthdDraw::draw_date(const animation* anim) {
     draw_text(percent_field.font, x, y, datetime_str);
 }
 
-void HealthdDraw::draw_version(const animation* anim) {
+void HealthdDraw::draw_version(const animation* /*anim*/) {
     if (!graphics_available || sys_font == nullptr) return;
 
     const char* version_text = "v1.0.0";
 
+    // Mede o comprimento do texto em pixels
     int str_len_px = gr_measure(sys_font, version_text);
+
+    // Centraliza horizontalmente
     int x = (screen_width_ - str_len_px) / 2;
+
+    // Posiciona 10px acima da borda inferior
     int y = screen_height_ - char_height_ - 10;
 
+    // Define cor azul
     gr_color(0, 123, 255, 255);
+
+    // Desenha o texto com a fonte do sistema (sempre disponível)
     draw_text(sys_font, x, y, version_text);
 }
 
-void HealthdDraw::draw_header(const animation* anim) {
-    if (!graphics_available) return;
-
-    const animation::text_field& percent_field = anim->text_percent;
-    if (percent_field.font == nullptr) return;
+void HealthdDraw::draw_header(const animation* /*anim*/) {
+    if (!graphics_available || sys_font == nullptr) return;
 
     const char* header_text = "DevTitans2025/1";
 
-    int x, y;
-    int length = strlen(header_text);
-    determine_xy(percent_field, length, &x, &y);
+    // Mede comprimento do texto em pixels
+    int str_len_px = gr_measure(sys_font, header_text);
 
-    y = 10;
+    // Centraliza horizontalmente
+    int x = (screen_width_ - str_len_px) / 2;
 
+    // Posição fixa no topo da tela (10px abaixo da borda superior)
+    int y = 10;
+
+    // Cor branca
     gr_color(255, 255, 255, 255);
-    draw_text(percent_field.font, x, y, header_text);
+
+    // Desenha o texto com fonte garantida
+    draw_text(sys_font, x, y, header_text);
 }
 
 void HealthdDraw::redraw_screen(const animation* batt_anim, GRSurface* surf_unknown) {
@@ -288,6 +299,7 @@ void HealthdDraw::draw_percent(const animation* anim) {
 }
 
 void HealthdDraw::draw_battery(const animation* anim) {
+    
     if (!graphics_available) return;
 
     draw_battery_bar(anim->cur_level);
