@@ -55,32 +55,44 @@ static int get_split_offset() {
 void HealthdDraw::draw_temperature(const animation* anim) {
     if (!graphics_available) return;
 
-    
     const animation::text_field& percent_field = anim->text_percent;
     if (percent_field.font == nullptr) return;
 
-    // 1. Ler o dado 
+    // 1. Ler o dado
     int temp_celsius = anim->cur_temp / 10; // Converte para 35
 
     // 2. Formatar o texto
+    // Usando base::StringPrintf
     std::string temp_str = base::StringPrintf("%d°C", temp_celsius);
+    int length = temp_str.size(); // Comprimento da string para determine_xy
 
     // 3. Lógica de Cor (UX)
     int r = 255, g = 255, b = 255; // Padrão: Branco
 
-    if (temp_celsius >= 45) {         // 45°C+ (Perigo)
-        r = 255; g = 0; b = 0;     // Vermelho
+    if (temp_celsius >= 45) {          // 45°C+ (Perigo)
+        r = 255; g = 0; b = 0;      // Vermelho
     } else if (temp_celsius >= 38) { // 38°C-44°C (Quente)
-        r = 255; g = 165; b = 0;   // Laranja
+        r = 255; g = 165; b = 0;    // Laranja
     } else if (temp_celsius <= 10) { // 10°C ou menos (Frio)
-        r = 0; g = 150; b = 255;   // Azul
+        r = 0; g = 150; b = 255;    // Azul
     }
     // (Entre 11°C e 37°C fica branco/Normal)
 
     // 4. Definir a Posição (canto superior direito)
-    int text_width = gr_measure(percent_field.font, temp_str.c_str());
-    int x = screen_width_ - text_width - 20; // 20px da borda direita
-    int y = 100; // Mesma altura do seu "Carregando..."
+    // Para usar determine_xy, precisamos de um campo que não seja o text_percent
+    // (que é centralizado) ou precisamos de um campo para a temperatura.
+    // Como estamos usando o campo da porcentagem, vamos simular o canto superior direito
+    // definindo pos_x para um valor negativo (que em determine_xy move para a direita)
+    // e ajustando o Y manualmente após o cálculo inicial.
+
+    int x, y;
+    // Criamos um campo temporário para simular a margem direita de 20px (pos_x = -20)
+    // e a altura desejada.
+    animation::text_field temp_field = percent_field;
+    temp_field.pos_x = -20; // Alinhamento à direita com 20px de margem
+    temp_field.pos_y = 100; // Altura fixa desejada
+
+    determine_xy(temp_field, length, &x, &y);
 
     // 5. Desenhar o texto
     gr_color(r, g, b, 255);
@@ -150,37 +162,76 @@ void HealthdDraw::draw_date(const animation* anim) {
     draw_text(percent_field.font, x, y, datetime_str);
 }
 
-void HealthdDraw::draw_header(const animation* anim) {
-    if (!graphics_available || sys_font == nullptr) return;
+void HealthdDraw::draw_header_percent_style(const animation* anim) {
+    if (!graphics_available) return;
 
-    std::string header_text = "Carregando...";
+    // Obtém as propriedades (Fonte, Cores, Posição) do campo de porcentagem
+    const animation::text_field& field = anim->text_percent;
+    if (field.font == nullptr) return;
 
-    // Calcula posição com base no tamanho do texto
+    std::string header_text = "67Carreg1ando...";
+    int length = header_text.size();
+
+    // Calcula posição X centralizada ou conforme definido no campo
     int x, y;
-    determine_xy(anim->text_percent, header_text.size(), &x, &y);
+    determine_xy(field, length, &x, &y);
 
-    // Ajusta a posição para o topo da tela
-    y = 80; // por exemplo, 80px do topo
+    // Ajusta a posição Y para o topo da tela, como você fez anteriormente
+    y = 80;
 
-    // Define cor (azul ciano suave)
+    // Define a cor (azul ciano suave)
     gr_color(0, 200, 255, 255);
 
-    // Desenha o texto com sys_font
-    draw_text(sys_font, x, y, header_text.c_str());
+    // Desenha o texto usando a FONTE do campo de porcentagem
+    draw_text(field.font, x, y, header_text.c_str());
 }
 
+void HealthdDraw::draw_header_sysfont_oi(const animation* anim) {
+    if (!graphics_available || sys_font == nullptr) return;
+
+    std::string oi_text = "OI-77";
+    int length = oi_text.size();
+
+    // 1. Criar um campo temporário para usar a sys_font com determine_xy
+    animation::text_field temp_field;
+    
+    // Configurar a fonte e dimensões corretas do sistema
+    temp_field.font = sys_font; // *** Chave para o determine_xy usar as dimensões corretas ***
+    // Preenche com as posições desejadas
+    temp_field.pos_x = CENTER_VAL; // Centralizar X
+    temp_field.pos_y = 80;         // 80px do topo em Y
+
+    int x, y;
+    
+    // 2. Chamar determine_xy usando o campo temporário e o comprimento
+    // determine_xy usará temp_field.font->char_width (sys_font) e calculará x centralizado e y=80.
+    determine_xy(temp_field, length, &x, &y);
+
+    // 3. Define cor (amarelo)
+    gr_color(255, 255, 0, 255);
+
+    // 4. Desenha o texto com sys_font na posição calculada
+    draw_text(sys_font, x, y, oi_text.c_str());
+}
 
 void HealthdDraw::draw_version_t(const animation* anim) {
     if (!graphics_available) return;
 
     const animation::text_field& percent_field = anim->text_percent;
+    if (percent_field.font == nullptr) return;
 
     std::string version_str = base::StringPrintf("v1.0.0-beta");
- 
-    int x, y;
-    determine_xy(percent_field, version_str.size(), &x, &y);
+    
+    int length = version_str.size();
 
-    // Texto em cinza-azulado
+    int x, y;
+
+    animation::text_field temp_field = percent_field;
+
+    temp_field.pos_y = -20 - percent_field.font->char_height; // Alinha ao rodapé com 20px de margem.
+
+    determine_xy(temp_field, length, &x, &y);
+
     gr_color(100, 180, 255, 255);
 
     draw_text(percent_field.font, x, y, version_str.c_str());
@@ -339,23 +390,6 @@ void HealthdDraw::draw_percent(const animation* anim) {
     gr_color(r, g, b, field.color_a);
     draw_text(field.font, x, y, str.c_str());
 
- 
-
-    std::string version_str = base::StringPrintf("v2.0.0-beta");
-    
-
-    // Mede o comprimento do texto
-    int text_width = gr_measure(field.font, version_str.c_str());
-    int x1 = (screen_width_ - text_width) / 2;
-    int y1 = screen_height_ - char_height_ - 20;  // 20px do rodapé
-
-    // Fundo escuro semitransparente para dar contraste
-    gr_color(0, 0, 0, 120);
-    gr_fill(x1 - 10, y1 - 5, x1 + text_width + 10, y1 + char_height_ + 5);
-
-    // Texto em cinza-azulado
-    gr_color(255, 255, 255, 255);
-    draw_text(field.font, x1, y1, version_str.c_str());
 }
 
 void HealthdDraw::draw_battery(const animation* anim) {
@@ -366,9 +400,8 @@ void HealthdDraw::draw_battery(const animation* anim) {
     draw_version_t(anim);
     draw_percent(anim);
     draw_date(anim);
-    draw_header(anim);
-
-
+    draw_header_sysfont_oi(anim);
+    draw_header_percent_style(anim);
     draw_temperature(anim);
 
 
