@@ -52,6 +52,42 @@ static int get_split_offset() {
     return static_cast<int>(value);
 }
 
+void HealthdDraw::draw_temperature(const animation* anim) {
+    if (!graphics_available) return;
+
+    
+    const animation::text_field& percent_field = anim->text_percent;
+    if (percent_field.font == nullptr) return;
+
+    // 1. Ler o dado 
+    int temp_celsius = anim->cur_temp / 10; // Converte para 35
+
+    // 2. Formatar o texto
+    std::string temp_str = base::StringPrintf("%d°C", temp_celsius);
+
+    // 3. Lógica de Cor (UX)
+    int r = 255, g = 255, b = 255; // Padrão: Branco
+
+    if (temp_celsius >= 45) {         // 45°C+ (Perigo)
+        r = 255; g = 0; b = 0;     // Vermelho
+    } else if (temp_celsius >= 38) { // 38°C-44°C (Quente)
+        r = 255; g = 165; b = 0;   // Laranja
+    } else if (temp_celsius <= 10) { // 10°C ou menos (Frio)
+        r = 0; g = 150; b = 255;   // Azul
+    }
+    // (Entre 11°C e 37°C fica branco/Normal)
+
+    // 4. Definir a Posição (canto superior direito)
+    int text_width = gr_measure(percent_field.font, temp_str.c_str());
+    int x = screen_width_ - text_width - 20; // 20px da borda direita
+    int y = 100; // Mesma altura do seu "Carregando..."
+
+    // 5. Desenhar o texto
+    gr_color(r, g, b, 255);
+    draw_text(percent_field.font, x, y, temp_str.c_str());
+}
+
+
 HealthdDraw::HealthdDraw(animation* anim)
     : kSplitScreen(get_split_screen()), kSplitOffset(get_split_offset()) {
     graphics_available = true;
@@ -79,71 +115,76 @@ HealthdDraw::HealthdDraw(animation* anim)
 HealthdDraw::~HealthdDraw() {}
 
 void HealthdDraw::draw_date(const animation* anim) {
-    if (!graphics_available) return;
+    // if (!graphics_available) return;
 
-    const animation::text_field& percent_field = anim->text_clock;
+    // Usa o mesmo campo da porcentagem para manter o mesmo tamanho e estilo da fonte
+    const animation::text_field& percent_field = anim->text_percent;
     if (percent_field.font == nullptr) return;
 
+    // Obtém data e hora atuais
     time_t rawtime;
     time(&rawtime);
     tm* time_info = localtime(&rawtime);
 
-    static constexpr char DATETIME_FORMAT[] = "%d/%m/%Y %H:%M";
-    static constexpr int DATETIME_LENGTH = 20;
+    static constexpr char DATETIME_FORMAT[] = "%d/%m/%Y";
+    // static constexpr char DATETIME_FORMAT[] = "%d/%m/%Y %H:%M";
+    LOGE("draw_date: MONTOU A DATA");
+    // static constexpr int DATETIME_LENGTH = 16;
+    static constexpr int DATETIME_LENGTH = 11;
     char datetime_str[DATETIME_LENGTH];
 
     size_t length = strftime(datetime_str, DATETIME_LENGTH, DATETIME_FORMAT, time_info);
-    if (length != DATETIME_LENGTH - 1) return;
+    if (length < 1) return;
 
+    // Calcula posição centralizada com base na porcentagem
     int x, y;
     determine_xy(percent_field, length, &x, &y);
 
-    y += percent_field.font->char_height + 10;
+    // Move o texto para baixo da porcentagem
+    y += percent_field.font->char_height + 50;  // 10px de espaço entre % e data/hora
 
+    // Usa a mesma cor e opacidade da porcentagem
     gr_color(255, 255, 255, 255);
+
+    // Desenha a data/hora
     draw_text(percent_field.font, x, y, datetime_str);
 }
 
-void HealthdDraw::draw_version(const animation* /*anim*/) {
+void HealthdDraw::draw_header(const animation* anim) {
     if (!graphics_available || sys_font == nullptr) return;
 
-    const char* version_text = "v1.0.0";
+    std::string header_text = "Carregando...";
 
-    // Mede o comprimento do texto em pixels
-    int str_len_px = gr_measure(sys_font, version_text);
+    // Calcula posição com base no tamanho do texto
+    int x, y;
+    determine_xy(anim->text_percent, header_text.size(), &x, &y);
 
-    // Centraliza horizontalmente
-    int x = (screen_width_ - str_len_px) / 2;
+    // Ajusta a posição para o topo da tela
+    y = 80; // por exemplo, 80px do topo
 
-    // Posiciona 10px acima da borda inferior
-    int y = screen_height_ - char_height_ - 10;
+    // Define cor (azul ciano suave)
+    gr_color(0, 200, 255, 255);
 
-    // Define cor azul
-    gr_color(0, 123, 255, 255);
-
-    // Desenha o texto com a fonte do sistema (sempre disponível)
-    draw_text(sys_font, x, y, version_text);
+    // Desenha o texto com sys_font
+    draw_text(sys_font, x, y, header_text.c_str());
 }
 
-void HealthdDraw::draw_header(const animation* /*anim*/) {
-    if (!graphics_available || sys_font == nullptr) return;
 
-    const char* header_text = "DevTitans2025/1";
+void HealthdDraw::draw_version_t(const animation* anim) {
+    if (!graphics_available) return;
 
-    // Mede comprimento do texto em pixels
-    int str_len_px = gr_measure(sys_font, header_text);
+    const animation::text_field& percent_field = anim->text_percent;
 
-    // Centraliza horizontalmente
-    int x = (screen_width_ - str_len_px) / 2;
+    std::string version_str = base::StringPrintf("v1.0.0-beta");
+ 
+    int x, y;
+    determine_xy(percent_field, version_str.size(), &x, &y);
 
-    // Posição fixa no topo da tela (10px abaixo da borda superior)
-    int y = 10;
+    // Texto em cinza-azulado
+    gr_color(100, 180, 255, 255);
 
-    // Cor branca
-    gr_color(255, 255, 255, 255);
+    draw_text(percent_field.font, x, y, version_str.c_str());
 
-    // Desenha o texto com fonte garantida
-    draw_text(sys_font, x, y, header_text);
 }
 
 void HealthdDraw::redraw_screen(const animation* batt_anim, GRSurface* surf_unknown) {
@@ -214,6 +255,7 @@ void HealthdDraw::determine_xy(const animation::text_field& field,
                                const int length, int* x, int* y) {
     *x = field.pos_x;
     screen_width_ = gr_fb_width() / (kSplitScreen ? 2 : 1);
+    
     screen_height_ = gr_fb_height();
 
     int str_len_px = length * field.font->char_width;
@@ -268,15 +310,15 @@ void HealthdDraw::draw_percent(const animation* anim) {
 
     struct ColorPoint { int level; int r; int g; int b; };
     static const ColorPoint colors[] = {
-        {0,   255,   0,   0},      // Red
-        {15,  255,  69,   0},      // OrangeRed
-        {30,  255, 140,   0},      // DarkOrange
-        {45,  255, 165,   0},      // Orange
-        {50,  255, 255,   0},      // Yellow
-        {65,  255, 215,   0},      // Gold
-        {75,  255, 255, 224},      // LightYellow
-        {85,   60, 179, 113},      // MediumSeaGreen
-        {100,   0, 255,   0}       // Green
+        {0,   255,   0,   0},      // Vermelho
+        {15,  255,  69,   0},      // Laranja-Avermelhado
+        {30,  255, 140,   0},      // Laranja-Escuro
+        {45,  255, 165,   0},      // Laranja
+        {50,  255, 255,   0},      // Amarelo
+        {65,  178, 255,   0},      // Verde-Limão Amarelado
+        {75,  127, 255,   0},      // Verde-Limão
+        {85,   76, 255,   0},      // Verde-Claro
+        {100,   0, 255,   0}       // Verde
     };
 
     int r = 0, g = 0, b = 0;
@@ -296,6 +338,24 @@ void HealthdDraw::draw_percent(const animation* anim) {
 
     gr_color(r, g, b, field.color_a);
     draw_text(field.font, x, y, str.c_str());
+
+ 
+
+    std::string version_str = base::StringPrintf("v2.0.0-beta");
+    
+
+    // Mede o comprimento do texto
+    int text_width = gr_measure(field.font, version_str.c_str());
+    int x1 = (screen_width_ - text_width) / 2;
+    int y1 = screen_height_ - char_height_ - 20;  // 20px do rodapé
+
+    // Fundo escuro semitransparente para dar contraste
+    gr_color(0, 0, 0, 120);
+    gr_fill(x1 - 10, y1 - 5, x1 + text_width + 10, y1 + char_height_ + 5);
+
+    // Texto em cinza-azulado
+    gr_color(255, 255, 255, 255);
+    draw_text(field.font, x1, y1, version_str.c_str());
 }
 
 void HealthdDraw::draw_battery(const animation* anim) {
@@ -303,10 +363,17 @@ void HealthdDraw::draw_battery(const animation* anim) {
     if (!graphics_available) return;
 
     draw_battery_bar(anim->cur_level);
-    draw_header(anim);
-    draw_date(anim);
+    draw_version_t(anim);
     draw_percent(anim);
-    draw_version(anim);
+    draw_date(anim);
+    draw_header(anim);
+
+
+    draw_temperature(anim);
+
+
+
+
 }
 
 /**
@@ -322,6 +389,7 @@ void HealthdDraw::draw_battery_bar(int level) {
 
     int filled_width = (bar_width * level) / 100;
 
+    // Color gradient: Red (low) → Yellow (mid) → Green (high)
     int r = 0, g = 0, b = 0;
     if (level <= 30) {
         r = 255; g = (255 * level) / 30; b = 0;
@@ -333,9 +401,11 @@ void HealthdDraw::draw_battery_bar(int level) {
         r = 0; g = 255; b = 0;
     }
 
+    // Draw empty background bar
     gr_color(50, 50, 50, 255);
     gr_fill(x, y, bar_width, bar_height);
 
+    // Draw filled portion
     gr_color(r, g, b, 255);
     gr_fill(x, y, filled_width, bar_height);
 }
