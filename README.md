@@ -351,6 +351,27 @@ O arquivo PNG customizado é referenciado como `anim->text_percent.font_file` e 
 | Alexandre Bruno Mota dos Santos | Engenheiro de Serviço de Sistema (Implementação Rotação) | Implementar os mecanismos de detecção de vídeo |
 | Hellmut Albert Alenca Schuster | Engenheiro de Integração e Testes Finais | Unificar as soluções de animação e rotação, além de validar a solução completa |
 
+Orientados pelo professor Eduardo Souto.
+
+---
+
+## 🎓 Colaboradores e Orientação
+
+### Corpo Docente e Técnico do Curso DevTITANS
+
+O desenvolvimento deste projeto contou com a orientação, supervisão e apoio técnico de destacados profissionais e docentes (em ordem alfabética):
+
+- **Daniel Finimundi**
+- **Diogo Soares Moreira**
+- **Eduardo Souto**
+- **Horacio Oliveira**
+- **Mateus Preste**
+- **Moises Gomes**
+- **Raimundo Barreto**
+- **Yuri Assayag**
+
+Estes colaboradores forneceram direcionamento técnico, revisão arquitetural, validação de implementações e mentoria ao longo de todo o desenvolvimento do projeto Smart Flip Charge.
+
 ---
 
 ## 📚 Referências Técnicas
@@ -412,7 +433,39 @@ adb sideload out/target/product/nio/lineage-21.0-YYYYmmDD-UNOFFICIAL-nio.zip
 
 ---
 
-## 📄 Licença
+## � Agradecimentos
+
+### Curso DevTITANS
+
+Este projeto foi desenvolvido como resultado do **Curso de Capacitação em Android e Sistemas Embarcados** do programa **DevTITANS** - *Desenvolvimento, Tecnologia e Inovação em Android e Sistemas Embarcados*.
+
+**Sobre o DevTITANS:**
+- 🏫 **Instituição**: Instituto de Computação (IComp) / UFAM
+- 🤝 **Parcerias**: Motorola e Flextronics
+- 🎓 **Objetivo**: Formação de recursos humanos de alta qualidade com conhecimentos técnicos avançados e especializados na criação, personalização e manutenção da plataforma Android em dispositivos embarcados
+- 👥 **Público-alvo**: Alunos de graduação, pós-graduação e profissionais do mercado
+- 📅 **Próxima Edição**: Março/2026 (Previsão)
+
+**Diferenciais do Curso:**
+- ✅ Exploração de **todas as camadas do Android** - da aplicação até o hardware
+- ✅ Criação de um **Android personalizado** para executar em smartphones, emulador e Raspberry Pi
+- ✅ Desenvolvimento prático de **drivers Linux** (exemplo: driver USB para NodeMCU)
+- ✅ Integração de **dispositivos IoT** com aplicações Android
+- ✅ Suporte completo de instrução - "Se você não conseguir terminar o curso por falta de conhecimento, isso é mais culpa nossa do que sua!"
+
+**Localização:**
+```
+Instituto de Computação - UFAM
+Av. Gen. Rodrigo Octávio, 6200
+Setor Norte - Manaus - AM
+CEP: 69080-900
+```
+
+Este projeto é um exemplo prático dos conhecimentos adquiridos no curso, demonstrando a aplicação de conceitos avançados de AOSP, customização de animações de boot e implementação de lógica contextual em sistemas embarcados Android.
+
+---
+
+## �📄 Licença
 
 Este projeto segue a licença Apache License 2.0, conforme padrão do AOSP.
 
