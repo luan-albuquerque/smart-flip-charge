@@ -41,44 +41,64 @@ class HealthdDraw {
   // Detect dual display
   virtual bool has_multiple_connectors();
 
-  static std::unique_ptr<HealthdDraw> Create(animation* anim);
+  static std::unique_ptr<HealthdDraw> Create(animation *anim);
 
  protected:
-  // Clear screen.
   virtual void clear_screen();
 
-  // Returns the last y-offset of where the surface ends.
+  // returns the last y-offset of where the surface ends.
   virtual int draw_surface_centered(GRSurface* surface);
-
-  // Draws text on screen.
+  // Negative x or y coordinates center text.
   virtual int draw_text(const GRFont* font, int x, int y, const char* str);
 
-  // Determines text position.
+  // Negative x or y coordinates position the text away from the opposite edge
+  // that positive ones do.
   virtual void determine_xy(const animation::text_field& field,
                             const int length, int* x, int* y);
 
   // Draws battery animation, if it exists.
   virtual void draw_battery(const animation* anim);
-
-  // Draws the horizontal battery bar (new).
-  virtual void draw_battery_bar(int level);
-
   // Draws clock text, if animation contains text_field data.
   virtual void draw_clock(const animation* anim);
-
-  // Draws date text.
-  virtual void draw_date(const animation* anim);
-  
-  virtual void draw_header_sysfont_oi(const animation* anim);
-  
-  virtual void draw_header_percent_style(const animation* anim);
-
-  virtual void draw_version(const animation* anim);
   // Draws battery percentage text if animation contains text_field data.
   virtual void draw_percent(const animation* anim);
-
-  // Draws charger->surf_unknown or fallback text.
+  // Draws charger->surf_unknown or basic text.
   virtual void draw_unknown(GRSurface* surf_unknown);
+
+/**
+   * @brief Desenha a data e hora atuais do sistema.
+   *
+   * Obtém e formata a data/hora, posicionando-a abaixo da porcentagem de bateria.
+   * A cor do texto varia com base no campo de porcentagem.
+   *
+   * @param anim Estrutura de dados da animação.
+   */
+  virtual void draw_date(const animation* anim);
+  
+  /**
+   * @brief Desenha o cabeçalho principal no topo da tela (Ex: DevTITANS).
+   *
+   * Posicionado no topo da tela, usando a cor Verde.
+   *
+   * @param anim Estrutura de dados da animação.
+   */
+  virtual void draw_header(const animation* anim);
+
+  /**
+   * @brief Desenha o subcabeçalho logo abaixo do cabeçalho principal (Ex: 2025/1).
+   *
+   * Posicionado logo abaixo do header e usando a cor Vermelha.
+   *
+   * @param anim Estrutura de dados da animação.
+   */
+  virtual void draw_subheader(const animation* anim); // NOVO MÉTODO ADICIONADO
+
+  /**
+   * @brief Desenha a versão do software no rodapé (bottom) da tela, usando a cor Azul.
+   *
+   * @param anim Estrutura de dados da animação.
+   */
+  virtual void draw_version(const animation* anim);
 
   // Pixel sizes of characters for default font.
   int char_width_;
@@ -90,14 +110,13 @@ class HealthdDraw {
 
   // Device screen is split vertically.
   const bool kSplitScreen;
-
   // Pixels to offset graphics towards center split.
   const int kSplitOffset;
 
-  // System text font, may be nullptr.
+  // system text font, may be nullptr
   const GRFont* sys_font;
 
-  // True if minui init'ed OK, false if minui init failed.
+  // true if minui init'ed OK, false if minui init failed
   bool graphics_available;
 
  private:
@@ -106,4 +125,3 @@ class HealthdDraw {
 };
 
 #endif  // HEALTHD_DRAW_H
-
