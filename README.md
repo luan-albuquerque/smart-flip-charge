@@ -424,15 +424,6 @@ adb sideload out/target/product/nio/lineage-21.0-YYYYmmDD-UNOFFICIAL-nio.zip
 
 ---
 
-## 📝 Notas de Desenvolvimento
-
-- Este projeto requer compilação customizada do AOSP/Lineage OS
-- Mudanças em `healthd_draw.cpp` afetam a tela de boot - testar sempre em hardware real
-- O SettingsObserver deve ser registrado ANTES de chamar observadores para evitar race conditions
-- Cores são definidas como ARGB8888 (RGB + Alpha)
-
----
-
 ## � Agradecimentos
 
 ### Curso DevTITANS
@@ -479,5 +470,5 @@ Licensed under the Apache License, Version 2.0
 
 **Turma**: 2025/1  
 **Última Atualização**: 26 de novembro de 2025  
-**Status**: Concluído
+**Status**: Concluindo
 
