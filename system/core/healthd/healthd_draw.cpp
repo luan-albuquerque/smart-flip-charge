@@ -335,7 +335,7 @@ void HealthdDraw::draw_version(const animation* anim) {
 
     determine_xy(temp_field, length, &x, &y);
 
-    // Define a cor (Azul claro: R:20, G:90, B:200, A:255).
+    // Define a cor AZUL SAFIRA (R:20, G:90, B:200, A:255).
     gr_color(20, 90, 200, 255);
 
     // Desenha o texto da versão.
