@@ -436,6 +436,7 @@ Este projeto foi desenvolvido como resultado do **Curso de Capacitação em Andr
 - 🎓 **Objetivo**: Formação de recursos humanos de alta qualidade com conhecimentos técnicos avançados e especializados na criação, personalização e manutenção da plataforma Android em dispositivos embarcados
 - 👥 **Público-alvo**: Alunos de graduação, pós-graduação e profissionais do mercado
 - 📅 **Próxima Edição**: Março/2026 (Previsão)
+- 🌐 **Site**: https://devtitans.icomp.ufam.edu.br/index.php
 
 **Diferenciais do Curso:**
 - ✅ Exploração de **todas as camadas do Android** - da aplicação até o hardware
